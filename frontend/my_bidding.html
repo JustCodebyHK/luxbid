@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Bidding — LuxBid</title>
+  <meta name="description" content="See all properties you have bid on.">
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/data.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <link rel="stylesheet" href="browse.css" />
+  <style>body{background:#000;color:#fff} .card{background:#18181b;border-radius:16px;overflow:hidden;margin-bottom:24px;box-shadow:0 4px 24px #0004;} .card img{width:100%;height:220px;object-fit:cover;} .card .body{padding:18px;} .btn{background:#ffd14f;color:#000;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;display:inline-block;margin-top:10px;} .btn:hover{background:#c99600;}</style>
+</head>
+<body>
+  <header style="padding:18px 0 0 0;text-align:center"><a href="index.html" class="btn" style="float:left;margin-left:18px;">Home</a><h1>My Bidding</h1></header>
+  <main class="container" style="max-width:900px;margin:0 auto;padding:32px 12px;">
+    <div id="myGrid"></div>
+  </main>
+  <script>
+    const BACKEND_BASE = window.__LUX_BACKEND_BASE__ || '';
+
+    function getMyBids(){
+      try { return JSON.parse(localStorage.getItem('myBids')||'[]'); } catch { return []; }
+    }
+
+    async function fetchUserBidsFromApi(){
+      const token = localStorage.getItem('lux_token');
+      if (!token) return null;
+      try {
+        const res = await fetch(BACKEND_BASE + '/api/bids/my-bids', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('Failed to load bids');
+        const data = await res.json();
+        return data.bids || [];
+      } catch (e) {
+        console.warn('Could not fetch user bids from API', e);
+        return null;
+      }
+    }
+
+    async function deleteBidApi(bidId){
+      const token = localStorage.getItem('lux_token');
+      if (!token) throw new Error('Not authenticated');
+      const res = await fetch(BACKEND_BASE + '/api/bids/' + encodeURIComponent(bidId), {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(()=>null);
+        throw new Error(txt || 'Failed to delete bid');
+      }
+      return true;
+    }
+
+    function deleteLocalBidsByProperty(propertyId){
+      const bids = getMyBids().filter(b => b.propertyId !== propertyId);
+      localStorage.setItem('myBids', JSON.stringify(bids));
+    }
+
+    async function handleDeleteBid(bidId, propertyId){
+      if (!confirm('Are you sure you want to cancel this bid?')) return;
+      const token = localStorage.getItem('lux_token');
+      try {
+        if (token && bidId) {
+          await deleteBidApi(bidId);
+        } else {
+          // Fallback to deleting local/demo bids for this property
+          deleteLocalBidsByProperty(propertyId);
+        }
+        await renderMyBids();
+        alert('Bid cancelled');
+      } catch (e) {
+        console.error(e);
+        alert(e.message || 'Failed to cancel bid');
+      }
+    }
+
+    async function renderMyBids(){
+      const grid = document.getElementById('myGrid');
+      // Try to load from API if authenticated
+      const apiBids = await fetchUserBidsFromApi();
+      if (apiBids && apiBids.length) {
+        // Group bids by property
+        const byProp = {};
+        apiBids.forEach(b => {
+          const pid = b.property._id || b.property;
+          byProp[pid] = byProp[pid] || { property: b.property, bids: [] };
+          byProp[pid].bids.push(b);
+        });
+        const list = Object.values(byProp);
+        if (!list.length) { grid.innerHTML = '<div class="text-neutral-400">You have not placed any bids yet.</div>'; return; }
+        grid.innerHTML = list.map(entry => {
+          const p = entry.property;
+          const bidsHtml = entry.bids.map(b => `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;"><div class="text-neutral-300">${window.inr(b.amount)}</div><button class="btn" onclick="handleDeleteBid('${b._id}','${p._id}')">Cancel</button></div>`).join('');
+          return `
+            <div class="card">
+              <img src="${window.selectImg(p.images||[])}" alt="${p.title}">
+              <div class="body">
+                <h2 class="text-xl font-bold mb-1">${p.title}</h2>
+                <div class="text-yellow-300 font-semibold mb-1">Current Bid: ${window.inr(p.currentBid || p.currentBid)}</div>
+                <div class="text-neutral-400 mb-1">Location: ${p.location || ''}</div>
+                <div class="text-neutral-400 mb-1">Ends: ${window.formatDateTime(p.deadline || p.deadline)}</div>
+                <a href="property.html?id=${encodeURIComponent(p._id)}" class="btn">View Property</a>
+                ${bidsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+        return;
+      }
+
+      // Fallback: use localStorage + mockProperties and show ALL bid entries
+      const myBids = getMyBids();
+      if (!myBids.length) { grid.innerHTML = '<div class="text-neutral-400">You have not placed any bids yet.</div>'; return; }
+
+      // Group by propertyId if present, otherwise by propertyName
+      const groups = {};
+      myBids.forEach(b => {
+        const key = b.propertyId || (b.propertyName || 'unknown');
+        groups[key] = groups[key] || { propertyId: b.propertyId || null, propertyName: b.propertyName || 'Unknown', bids: [] };
+        groups[key].bids.push(b);
+      });
+
+      const entries = Object.values(groups);
+      grid.innerHTML = entries.map(entry => {
+        const prop = (window.mockProperties||[]).find(p => (entry.propertyId && p._id===entry.propertyId) || (!entry.propertyId && p.title===entry.propertyName));
+        const title = prop?.title || entry.propertyName;
+        const img = prop ? window.selectImg(prop.images||[]) : (window.selectImg?.([]) || '');
+        const loc = prop?.location || '';
+        const deadline = prop?.deadline ? window.formatDateTime(prop.deadline) : '';
+        const current = prop?.currentBid;
+        const bidsHtml = entry.bids
+          .sort((a,b)=> (b.time||0)-(a.time||0))
+          .map(b => `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;"><div class="text-neutral-300">${window.inr(b.amount)}</div><div class="text-neutral-500 text-xs">${new Date(b.time).toLocaleString()}</div></div>`)
+          .join('');
+        const viewHref = prop?.
+          _id ? `property.html?id=${encodeURIComponent(prop._id)}` : '#';
+        const cancelOnClick = prop? `handleDeleteBid(null,'${prop._id}')` : '';
+        return `
+          <div class="card">
+            ${img?`<img src="${img}" alt="${title}">`:''}
+            <div class="body">
+              <h2 class="text-xl font-bold mb-1">${title}</h2>
+              ${current?`<div class="text-yellow-300 font-semibold mb-1">Current Bid: ${window.inr(current)}</div>`:''}
+              ${loc?`<div class="text-neutral-400 mb-1">Location: ${loc}</div>`:''}
+              ${deadline?`<div class="text-neutral-400 mb-1">Ends: ${deadline}</div>`:''}
+              ${prop?`<a href="${viewHref}" class="btn">View Property</a>`:''}
+              ${prop?`<div style="margin-top:10px;"><button class="btn" onclick="${cancelOnClick}">Cancel My Bids</button></div>`:''}
+              <div class="text-neutral-400 mt-2">Your Bids:</div>
+              ${bidsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Expose handler for inline onclick
+    window.handleDeleteBid = handleDeleteBid;
+
+    renderMyBids();
+  </script>
+</body>
+</html>

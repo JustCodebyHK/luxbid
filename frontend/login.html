@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login & Sign Up — LuxBid</title>
+  <meta name="description" content="Login or create an account to bid on luxury properties.">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white bg-[radial-gradient(ellipse_at_top,_rgba(234,179,8,0.06),_transparent_60%)]">
+  <header class="sticky top-0 z-10 backdrop-blur bg-black/70 border-b border-neutral-800">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="./index.html" class="text-yellow-300 font-extrabold tracking-wide">LuxBid</a>
+      <nav class="text-sm text-neutral-300 space-x-6">
+        <a class="hover:text-white" href="browse.html">Browse</a>
+        <a class="hover:text-white" href="login.html">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-12 max-w-md">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold mb-2">Welcome to LuxBid</h1>
+      <p class="text-neutral-400 text-sm">Sign in to start bidding on luxury properties</p>
+    </div>
+
+    <div class="border border-neutral-800 rounded-2xl p-6 space-y-4 bg-neutral-950/60 backdrop-blur shadow-xl shadow-black/30">
+      <div class="space-y-4">
+        <form id="emailLoginForm" class="space-y-3">
+          <div>
+            <label class="block text-sm mb-1">Email</label>
+            <input id="loginEmail" class="w-full rounded-md bg-neutral-900/80 border border-neutral-700 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" type="email" required />
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Password</label>
+            <input id="loginPassword" class="w-full rounded-md bg-neutral-900/80 border border-neutral-700 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" type="password" required />
+          </div>
+          <button type="submit" class="bg-yellow-400 text-black font-semibold w-full px-3 py-2 rounded-md hover:bg-yellow-300 shadow">Sign In</button>
+        </form>
+
+        <div class="flex items-center gap-3">
+          <div class="h-px bg-neutral-800 flex-1"></div>
+          <span class="text-xs uppercase tracking-wide text-neutral-500">or</span>
+          <div class="h-px bg-neutral-800 flex-1"></div>
+        </div>
+
+        <a href="http://localhost:3000/auth/google" class="block">
+          <button id="google-login" class="bg-white text-black border border-yellow-500 px-4 py-2 rounded flex items-center justify-center gap-2 w-full">
+            <img src="./google-icon.svg" alt="Google" class="w-5 h-5" />
+            Continue with Google
+          </button>
+        </a>
+        <p class="text-xs text-neutral-400 text-center">Use your Google account to sign in or sign up.</p>
+        <p class="text-sm text-neutral-300 text-center">New user? 
+          <a href="http://localhost:3000/auth/google" class="text-yellow-400 hover:text-yellow-300 underline">Sign up with Google</a>
+        </p>
+      </div>
+
+      <div class="text-xs text-neutral-400 text-center"></div>
+      <div class="grid grid-cols-2 gap-2">
+  <!-- Demo User button removed -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-10 border-t border-neutral-800 bg-black/60">
+    <div class="container mx-auto px-4 py-6 text-sm text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div>© <span id="y"></span> LuxBid. All rights reserved.</div>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-white" href="#">Privacy</a>
+        <a class="hover:text-white" href="#">Terms</a>
+        <a class="hover:text-white" href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Point the static-site to the backend during local testing. Change if your backend URL differs -->
+  <script>window.__LUX_BACKEND_BASE__ = 'http://localhost:8080';</script>
+  <script src="./assets/js/auth.js"></script>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    function showLogin(){
+      document.getElementById('loginTab').classList.add('bg-yellow-400', 'text-black');
+      document.getElementById('loginTab').classList.remove('text-neutral-400');
+      document.getElementById('signupTab').classList.remove('bg-yellow-400', 'text-black');
+      document.getElementById('signupTab').classList.add('text-neutral-400');
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('signupForm').classList.add('hidden');
+    }
+
+    function showSignup(){
+      document.getElementById('signupTab').classList.add('bg-yellow-400', 'text-black');
+      document.getElementById('signupTab').classList.remove('text-neutral-400');
+      document.getElementById('loginTab').classList.remove('bg-yellow-400', 'text-black');
+      document.getElementById('loginTab').classList.add('text-neutral-400');
+      document.getElementById('signupForm').classList.remove('hidden');
+      document.getElementById('loginForm').classList.add('hidden');
+    }
+
+    function demo(role){
+      // Keep demo local fallback
+      auth.login(role==='admin' ? 'admin@demo.local' : 'user@demo.local', role).then(()=>{
+        location.href = './browse.html';
+      }).catch(()=>{ location.href = './browse.html'; });
+    }
+
+    async function realLogin(e){
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        const res = await auth.login(email||'user@demo.local', password||'');
+          // After login, redirect to ?next= if present
+          const params = new URLSearchParams(location.search);
+          const next = params.get('next');
+          if (next) location.href = next; else location.href = './browse.html';
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Login failed');
+      }
+    }
+
+    async function realSignup(e){
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      try {
+        const res = await auth.register(email||'user@demo.local', password||'', name||'');
+        alert('Account created successfully!');
+        const params = new URLSearchParams(location.search);
+        const next = params.get('next');
+        if (next) location.href = next; else location.href = './browse.html';
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Registration failed');
+      }
+    }
+
+    // Demo helper buttons: if any demo login triggers are used, respect next param
+    (function(){
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next');
+      // Wire existing demo function (if present) to redirect to next
+      const originalDemo = window.demo;
+      window.demo = function(role){
+        if (originalDemo) originalDemo(role);
+        // delay redirect slightly to allow demo login handler to set user
+        setTimeout(()=>{
+          if (next) location.href = next; else location.href = './browse.html';
+        }, 200);
+      };
+    })();
+  </script>
+  <script>
+    const form = document.getElementById('emailLoginForm');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail')?.value || '';
+        const password = document.getElementById('loginPassword')?.value || '';
+        try {
+          const res = await fetch('http://localhost:3000/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email, password })
+          });
+          if (!res.ok) throw new Error('Login failed');
+          const params = new URLSearchParams(location.search);
+          const next = params.get('next');
+          location.href = next || './browse.html';
+        } catch (err) {
+          alert('Invalid email or password');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

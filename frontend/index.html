@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LuxBid — Luxury Property Auctions (Static Preview)</title>
+  <meta name="description" content="Bid on luxury real estate: houses, mansions, and villas with live auctions and real-time updates.">
+  <style>
+    :root { --gold:#c99600; --gold-300:#ffd14f; --bg:#0b0b0b; --card:#121212; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans","Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";background:#000;color:#fff}
+    .container{max-width:1120px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);border-bottom:1px solid #262626}
+    .nav{height:64px;display:flex;align-items:center;justify-content:space-between}
+    .brand{color:#ffd14f;font-weight:800;letter-spacing:.04em;text-decoration:none;font-size:1.125rem}
+    .links a{color:#d4d4d4;text-decoration:none;margin-left:20px}
+    .links a:hover{color:#fff}
+    .hero{padding:56px 0}
+    .hero h1{font-size:40px;line-height:1.1;margin:0 0 12px;font-weight:800}
+    .hero p{color:#d4d4d4;max-width:720px}
+    .cta{margin-top:18px;display:flex;gap:12px}
+    .btn{background:var(--gold);color:#000;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+    .btn:hover{background:var(--gold-300)}
+    .ghost{background:transparent;color:#d4d4d4;border:1px solid #333}
+    .ghost:hover{color:#fff}
+    .carousel{margin-top:24px;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);aspect-ratio:16/6;background:#0a0a0a}
+    .carousel img{width:100%;height:100%;object-fit:cover;display:block}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:20px;margin:28px 0 10px}
+    @media(min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1024px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{background:rgba(23,23,23,.7);backdrop-filter:blur(6px);border:1px solid #262626;border-radius:16px;overflow:hidden;transition:.2s transform}
+    .card:hover{transform:scale(1.01)}
+    .thumb{aspect-ratio:16/10;background:#0a0a0a}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .card .body{padding:14px}
+    .row{display:flex;align-items:center;justify-content:space-between}
+    .price{color:#ffd14f;font-weight:700}
+    .meta{color:#a3a3a3;font-size:12px}
+    .filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+    .pill{background:transparent;color:#d4d4d4;border:1px solid #333;border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:.85rem}
+    .pill:hover{color:#fff;border-color:#555}
+    .pill.active{background:var(--gold);color:#000;border-color:var(--gold)}
+    .pulse-highlight{animation:pulseGlow 1.5s ease 2}
+    @keyframes pulseGlow { 0%{box-shadow:0 0 0 rgba(255,209,79,0)} 40%{box-shadow:0 0 0 6px rgba(255,209,79,.18)} 100%{box-shadow:0 0 0 rgba(255,209,79,0)} }
+    /* Quick-bid modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal{background:#0d0d0d;border:1px solid #262626;border-radius:14px;min-width:300px;max-width:92vw;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+    .modal h3{margin:0 0 6px;font-size:1.1rem}
+    .modal .row{display:flex;gap:10px;margin-top:10px;align-items:center}
+    .modal input{flex:1;background:#0f0f0f;border:1px solid #3a3a3a;border-radius:8px;padding:10px;color:#fff}
+    .modal input:focus{outline:none;border-color:var(--gold)}
+    .modal .actions{display:flex;gap:10px;margin-top:12px;justify-content:flex-end}
+    .btn.secondary{background:transparent;color:#d4d4d4;border:1px solid #333}
+    .btn.secondary:hover{color:#fff}
+    /* Glowing border for call-to-action */
+    .glow-border{position:relative;border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(201,150,0,.25) inset, 0 0 12px rgba(201,150,0,.35);animation:gbPulse 1.8s ease-in-out infinite;color:var(--gold-300)!important;text-shadow:0 0 6px rgba(201,150,0,.55),0 0 12px rgba(201,150,0,.35)}
+    @keyframes gbPulse{0%,100%{box-shadow:0 0 0 2px rgba(201,150,0,.25) inset, 0 0 8px rgba(201,150,0,.28);text-shadow:0 0 6px rgba(201,150,0,.45),0 0 10px rgba(201,150,0,.3)}50%{box-shadow:0 0 0 2px rgba(201,150,0,.35) inset, 0 0 18px rgba(201,150,0,.5);text-shadow:0 0 10px rgba(201,150,0,.7),0 0 20px rgba(201,150,0,.45)}}
+    .hint{color:#a3a3a3;font-size:12px;margin-top:4px}
+    .error{color:#ff6b6b;font-size:12px;margin-top:6px;display:none}
+    .step{background:#161616;border:1px solid #2a2a2a;color:#ddd;border-radius:8px;padding:8px 10px;font-weight:700}
+    /* Get Started modal + toast */
+    .gs-grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;margin-top:10px}
+    @media(min-width:520px){.gs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .toast{position:fixed;bottom:18px;right:18px;background:#111;border:1px solid #2a2a2a;color:#eee;border-radius:12px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:none;z-index:60}
+    footer{margin-top:40px;border-top:1px solid #262626;background:rgba(0,0,0,.6)}
+    footer .inner{padding:28px 0;color:#a3a3a3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+    footer a{color:#a3a3a3;text-decoration:none;margin-left:16px}
+    footer a:hover{color:#fff}
+    /* Profile card styles */
+    .hidden{display:none!important}
+    .profile-wrap{position:relative;margin-top:18px}
+    .profile-glow{position:absolute;inset:-24px;background:radial-gradient(600px 120px at 20% 0%, rgba(201,150,0,.2), transparent 60%), radial-gradient(600px 120px at 80% 0%, rgba(123,97,255,.16), transparent 60%);filter:blur(20px);pointer-events:none}
+    .profile-card{position:relative;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border:1px solid #262626;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+    .profile-card .topline{height:3px;background:linear-gradient(90deg, #ff6ea8, #7b61ff, #ffd14f)}
+    .pc-body{padding:16px}
+    .pc-header{display:flex;align-items:center;gap:12px}
+    .avatar{position:relative;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#7b61ff,#2dd4bf);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:22px;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:none}
+    .pc-meta{min-width:0}
+    .pc-name{font-weight:800;letter-spacing:.01em}
+    .pc-email{color:#a3a3a3;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;display:none}
+    .pc-badge{margin-left:auto;background:#141414;border:1px solid #2a2a2a;color:#ffd14f;border-radius:999px;padding:6px 10px;font-weight:700;font-size:11px}
+    .pc-welcome{margin-top:10px;color:#d4d4d4;font-size:14px;opacity:1;transition:opacity .6s ease}
+    .pc-grid{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .pc-stat{background:#141414;border:1px solid #262626;border-radius:12px;padding:10px;text-align:center}
+    .pc-stat .v{font-weight:800}
+    .pc-stat .k{color:#a3a3a3;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+    .pc-actions{margin-top:12px;display:flex;gap:10px}
+    .pc-actions .btn-grad{flex:1;background:linear-gradient(90deg,#7b61ff,#ff6ea8);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:800}
+    .pc-actions .btn-ghost{flex:1;background:transparent;color:#d4d4d4;border:1px solid #333;border-radius:12px;padding:10px 14px;font-weight:800}
+    .pc-actions .btn-grad:hover{filter:brightness(1.1)}
+    .pc-actions .btn-ghost:hover{color:#fff;border-color:#555}
+    .shine{position:absolute;left:-20%;top:-8px;width:140%;height:26px;background:linear-gradient(180deg,rgba(255,255,255,.6),transparent);transform:rotate(2deg);opacity:.3;pointer-events:none}
+    /* Compact profile widget styles */
+    .profile-fixed{position:fixed;top:14px;right:16px;z-index:60}
+    .pf-avatar{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#7b61ff,#2dd4bf);border:1px solid #2a2a2a;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;padding:0;overflow:hidden}
+    .pf-avatar img{width:100%;height:100%;object-fit:cover;display:none}
+    .pf-avatar span{color:#fff;font-weight:800}
+    .pf-menu{position:absolute;right:0;top:52px;min-width:220px;background:#0f0f0f;border:1px solid #2a2a2a;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:10px}
+    .pf-header{padding:6px 8px 10px;border-bottom:1px solid #1f1f1f}
+    .pf-name{font-weight:800}
+    .pf-item{display:flex;align-items:center;justify-content:space-between;border-radius:10px;padding:10px 10px;color:#eaeaea;text-decoration:none;margin-top:8px}
+    .pf-item:hover{background:#141414}
+    .pf-stat .k{color:#a3a3a3;font-size:12px}
+    .pf-stat .v{font-weight:800}
+    .pf-action{border:1px solid #333;justify-content:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#">LuxBid</a>
+      <nav class="links">
+        <!-- Browse link removed -->
+        <div class="header-actions">
+          <a href="login.html" class="btn" id="loginBtn">Login</a>
+          <a href="admin.html" class="btn secondary" id="adminLoginBtn">Admin Login</a>
+          <div id="userMenu" style="display:none; position:relative;">
+            <button class="btn" id="userMenuBtn">Account ▾</button>
+            <div id="userDropdown" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #ddd; border-radius:8px; min-width:180px; box-shadow:0 4px 16px rgba(0,0,0,.12); z-index:1000;">
+              <a href="property.html" class="dropdown-item" id="postAuction">Post Auction</a>
+              <a href="property.html" class="dropdown-item" id="auctionStatus">Auction Status</a>
+              <a href="live_auctions.html" class="dropdown-item glow-border" id="liveAuction">Live Auction</a>
+              <a href="my_bidding.html" class="dropdown-item" id="myBidding">My Bidding</a>
+              <div style="border-top:1px solid #eee; margin:6px 0;"></div>
+              <a href="#" class="dropdown-item" id="logoutBtn">Logout</a>
+            </div>
+          </div>
+          <!-- Bidding options that will be shown/hidden based on auth status -->
+          <div id="biddingOptions" style="display: none; margin-left: 10px;">
+            <a href="live_auctions.html" class="btn secondary glow-border">Live Auctions</a>
+            <a href="my_bidding.html" class="btn secondary" style="margin-left: 10px;">My Bidding</a>
+          </div>
+        </div>
+        <!-- Get Started button removed -->
+      </nav>
+    </div>
+    <div id="user-info" class="hidden profile-fixed">
+      <button id="pfBtn" class="pf-avatar" aria-haspopup="true" aria-expanded="false">
+        <img id="userphoto" alt="User photo" />
+        <span id="pfFallback">U</span>
+      </button>
+      <div id="pfMenu" class="pf-menu" style="display:none;">
+        <div class="pf-header">
+          <div class="pf-name" id="username">User</div>
+        </div>
+        <div class="pf-item pf-stat">
+          <div class="k">Active Bids</div>
+          <div class="v" id="statActive">—</div>
+        </div>
+        <a class="pf-item pf-action" href="property.html">Post Auction</a>
+        <button id="pfLogout" class="pf-item pf-action" type="button">Logout</button>
+      </div>
+    </div>
+    <script>
+      // Show/hide user menu based on login state
+      function isUserLoggedIn() {
+        return !!localStorage.getItem('user');
+      }
+      function showUserMenu() {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('adminLoginBtn').style.display = 'none';
+        document.getElementById('userMenu').style.display = '';
+        // Show bidding options for logged-in users
+        document.getElementById('biddingOptions').style.display = 'inline-block';
+      }
+      function hideUserMenu() {
+        document.getElementById('loginBtn').style.display = '';
+        document.getElementById('adminLoginBtn').style.display = '';
+        document.getElementById('userMenu').style.display = 'none';
+        // Hide bidding options for non-logged-in users
+        document.getElementById('biddingOptions').style.display = 'none';
+      }
+      // Dropdown logic
+      document.addEventListener('DOMContentLoaded', function() {
+        if (isUserLoggedIn()) {
+          showUserMenu();
+        } else {
+          hideUserMenu();
+        }
+        var btn = document.getElementById('userMenuBtn');
+        var dropdown = document.getElementById('userDropdown');
+        if (btn) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+          });
+        }
+        document.addEventListener('click', function() {
+          if (dropdown) dropdown.style.display = 'none';
+        });
+        // Logout
+        var logout = document.getElementById('logoutBtn');
+        if (logout) {
+          logout.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('user');
+            hideUserMenu();
+            // Refresh page to update UI
+            location.reload();
+          });
+        }
+      });
+    </script>
+    <script>
+      // Enhance avatar fallback and welcome fade for profile card
+      (function(){
+        function setAvatarFallback(name){
+          try{
+            const fb = document.getElementById('pfFallback');
+            if (!fb) return;
+            const ch = (name||'U').trim().charAt(0).toUpperCase();
+            fb.textContent = ch || 'U';
+          }catch{}
+        }
+        function showWidget(){
+          const el = document.getElementById('user-info');
+          if (el) el.classList.remove('hidden');
+        }
+        // If earlier fetch('/me') already populated name/photo, we still ensure fallback and visibility.
+        fetch('/me', { credentials:'include' })
+          .then(r=> r.ok ? r.json() : null)
+          .then(user=>{
+            if (!user) return;
+            setAvatarFallback(user.name||'U');
+            const img = document.getElementById('userphoto');
+            if (img && user.photo){
+              img.src = user.photo;
+              img.onload = ()=>{ 
+                img.style.display='block'; 
+                const fb = document.getElementById('pfFallback');
+                if (fb) fb.style.display = 'none';
+              };
+              img.onerror = ()=>{ 
+                img.style.display='none'; 
+                const fb = document.getElementById('pfFallback');
+                if (fb) fb.style.display = '';
+              };
+            }
+            // Optionally populate quick stats if present on user
+            if (user.stats){
+              const {activeBids} = user.stats;
+              const el = document.getElementById('statActive');
+              if (el && typeof activeBids !== 'undefined') el.textContent = activeBids;
+            }
+            showWidget();
+            // Dropdown behavior
+            const btn = document.getElementById('pfBtn');
+            const menu = document.getElementById('pfMenu');
+            if (btn && menu){
+              btn.addEventListener('click', (e)=>{
+                e.stopPropagation();
+                const open = menu.style.display === 'block';
+                menu.style.display = open ? 'none' : 'block';
+                btn.setAttribute('aria-expanded', String(!open));
+              });
+              document.addEventListener('click', ()=>{ menu.style.display = 'none'; btn.setAttribute('aria-expanded','false'); });
+              document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ menu.style.display='none'; btn.setAttribute('aria-expanded','false'); }});
+              // Logout action (backend expects GET /logout which redirects)
+              const pfLogout = document.getElementById('pfLogout');
+              if (pfLogout){
+                pfLogout.addEventListener('click', (e)=>{
+                  e.preventDefault();
+                  pfLogout.disabled = true;
+                  try { localStorage.removeItem('user'); } catch {}
+                  window.location.href = '/logout';
+                });
+              }
+            }
+          }).catch(()=>{});
+      })();
+    </script>
+    <script src="./assets/js/auth.js"></script>
+    <script src="./assets/js/data.js"></script>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <h1>Explore Luxury Real Estate Auctions</h1>
+      <p>An online auction is an auction held over the internet
+        and accessed by internet connected devices. Just by Sitting
+        At one place</p>
+      <div class="cta">
+        <a class="btn" href="browse.html">Browse Properties</a>
+        <a class="btn ghost" href="#featured">View Featured</a>
+      </div>
+      <div class="carousel">
+        <img src="https://images.pexels.com/photos/87378/pexels-photo-87378.jpeg?_gl=1*66ydr7*_ga*NjIxNzQwOTQ5LjE3MjQ2OTE0MjI.*_ga_8JE65Q40S6*czE3NTgyMjI1NDUkbzIkZzEkdDE3NTgyMjI1NDgkajU3JGwwJGhw" alt="Luxury Estate">
+      </div>
+    </section>
+
+    <section id="featured" class="container">
+      <h2 style="font-size:1.25rem;margin:12px 0 8px;font-weight:700">Featured Properties</h2>
+      <div class="filters" id="featureFilters">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="house">Houses</button>
+        <button class="pill" data-filter="mansion">Mansions</button>
+        <button class="pill" data-filter="villa">Villas</button>
+        <button class="pill" data-filter="penthouse">Penthouses</button>
+        <button class="pill" data-filter="estate">Estates</button>
+      </div>
+      <div class="grid" id="featuredGrid">
+        <article class="card" data-type="villa">
+          <div class="thumb"><img src="https://storage.needpix.com/rsynced_images/mansion-4223279_1280.jpg" alt="Villa"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Mediterranean Villa</h3><div class="price" data-current="2450000">₹2,450,000</div></div>
+            <div class="meta">Amalfi Coast, IT • 4 bd • 4 ba • 4,200 sqft</div>
+            <div class="meta">Min increment <span data-min="10000">₹10,000</span> • Ends in 3d 12h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Mediterranean Villa">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Amalfi+Coast,+Italy&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Amalfi Coast, IT"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?q=80&w=1200&auto=format&fit=crop" alt="Modern Suburban House"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Modern Suburban House</h3><div class="price" data-current="980000">₹980,000</div></div>
+            <div class="meta">Austin, US • 3 bd • 2 ba • 2,100 sqft</div>
+            <div class="meta">Min increment <span data-min="4000">₹4,000</span> • Ends in 7d 1h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Modern Suburban House">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Austin,+US&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Austin, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="mansion">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop" alt="Classic French Mansion"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Classic French Mansion</h3><div class="price" data-current="7200000">₹7,200,000</div></div>
+            <div class="meta">Nice, FR • 7 bd • 8 ba • 12,000 sqft</div>
+            <div class="meta">Min increment <span data-min="30000">₹30,000</span> • Ends in 2d 18h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Classic French Mansion">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Nice,+France&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Nice, France"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1430285561322-7808604715df?q=80&w=1200&auto=format&fit=crop" alt="Cozy Cottage"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Cozy Cottage</h3><div class="price" data-current="650000">₹650,000</div></div>
+            <div class="meta">Lake District, UK • 2 bd • 1 ba • 1,200 sqft</div>
+            <div class="meta">Min increment <span data-min="2500">₹2,500</span> • Ends in 8d 5h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Cozy Cottage">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Lake+District,+UK&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Lake District, UK"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="mansion">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?q=80&w=1200&auto=format&fit=crop" alt="Victorian Mansion"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Victorian Mansion</h3><div class="price" data-current="5100000">₹5,100,000</div></div>
+            <div class="meta">Melbourne, AU • 5 bd • 6 ba • 8,500 sqft</div>
+            <div class="meta">Min increment <span data-min="22000">₹22,000</span> • Ends in 3d 9h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Victorian Mansion">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Melbourne,+Australia&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Melbourne, Australia"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="mansion">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop" alt="Mansion"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Modern Hillside Mansion</h3><div class="price" data-current="5980000">₹5,980,000</div></div>
+            <div class="meta">Los Angeles, US • 6 bd • 7 ba • 9,800 sqft</div>
+            <div class="meta">Min increment <span data-min="25000">₹25,000</span> • Ends in 1d 2h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Modern Hillside Mansion">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Los+Angeles,+US&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Los Angeles, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop" alt="House"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Lakeside Designer House</h3><div class="price" data-current="1320000">₹1,320,000</div></div>
+            <div class="meta">Zurich, CH • 3 bd • 3 ba • 2,700 sqft</div>
+            <div class="meta">Min increment <span data-min="5000">₹5,000</span> • Ends in 5d 8h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Lakeside Designer House">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Zurich,+CH&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Zurich, CH"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="penthouse">
+          <div class="thumb"><img src="https://cdn.pixabay.com/photo/2017/07/03/21/35/house-2469067_1280.jpg" alt="Penthouse"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Skyline Penthouse</h3><div class="price" data-current="3750000">₹3,750,000</div></div>
+            <div class="meta">Dubai, AE • 3 bd • 4 ba • 3,100 sqft</div>
+            <div class="meta">Min increment <span data-min="12500">₹12,500</span> • Ends in 2d 6h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Skyline Penthouse">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Dubai,+AE&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Dubai, AE"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="estate">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop" alt="Countryside Estate"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Countryside Estate</h3><div class="price" data-current="2080000">₹2,080,000</div></div>
+            <div class="meta">Cotswolds, UK • 5 bd • 4 ba • 5,300 sqft</div>
+            <div class="meta">Min increment <span data-min="8000">₹8,000</span> • Ends in 4d 3h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Countryside Estate">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Cotswolds,+UK&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Cotswolds, UK"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="villa">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop" alt="Beachfront Villa"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Beachfront Villa</h3><div class="price" data-current="4420000">₹4,420,000</div></div>
+            <div class="meta">Phuket, TH • 5 bd • 5 ba • 6,000 sqft</div>
+            <div class="meta">Min increment <span data-min="20000">₹20,000</span> • Ends in 2d 22h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Beachfront Villa">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Phuket,+TH&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Phuket, TH"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?q=80&w=1200&auto=format&fit=crop" alt="Mountain Retreat"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Mountain Retreat</h3><div class="price" data-current="1890000">₹1,890,000</div></div>
+            <div class="meta">Aspen, US • 4 bd • 3 ba • 3,500 sqft</div>
+            <div class="meta">Min increment <span data-min="9000">₹9,000</span> • Ends in 6d 4h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Mountain Retreat">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Aspen,+US&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Aspen, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="villa">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1505692794403-34d4982f88aa?q=80&w=1200&auto=format&fit=crop" alt="Bali Cliff Villa"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Bali Cliff Villa</h3><div class="price" data-current="3560000">₹3,560,000</div></div>
+            <div class="meta">Uluwatu, ID • 5 bd • 5 ba • 5,200 sqft</div>
+            <div class="meta">Min increment <span data-min="18000">₹18,000</span> • Ends in 4d 6h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Bali Cliff Villa">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Uluwatu,+Bali&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Uluwatu, ID"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="villa">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop" alt="Santorini White Villa"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Santorini White Villa</h3><div class="price" data-current="4120000">₹4,120,000</div></div>
+            <div class="meta">Santorini, GR • 4 bd • 4 ba • 3,600 sqft</div>
+            <div class="meta">Min increment <span data-min="16000">₹16,000</span> • Ends in 5d 10h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Santorini White Villa">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Santorini,+Greece&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Santorini, GR"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="mansion">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1560520653-9e0e9b84b3c3?q=80&w=1200&auto=format&fit=crop" alt="Tuscan Hill Mansion"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Tuscan Hill Mansion</h3><div class="price" data-current="6880000">₹6,880,000</div></div>
+            <div class="meta">Tuscany, IT • 6 bd • 7 ba • 10,800 sqft</div>
+            <div class="meta">Min increment <span data-min="26000">₹26,000</span> • Ends in 3d 4h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Tuscan Hill Mansion">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Tuscany,+Italy&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Tuscany, IT"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="mansion">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1200&auto=format&fit=crop" alt="Palm Beach Mansion"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Palm Beach Mansion</h3><div class="price" data-current="8340000">₹8,340,000</div></div>
+            <div class="meta">Palm Beach, US • 8 bd • 9 ba • 12,600 sqft</div>
+            <div class="meta">Min increment <span data-min="30000">₹30,000</span> • Ends in 1d 20h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Palm Beach Mansion">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Palm+Beach,+Florida&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Palm Beach, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="penthouse">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1494526585095-208a8d0e1f94?q=80&w=1200&auto=format&fit=crop" alt="Manhattan Skyline Penthouse"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Manhattan Skyline Penthouse</h3><div class="price" data-current="9050000">₹9,050,000</div></div>
+            <div class="meta">New York, US • 3 bd • 4 ba • 3,300 sqft</div>
+            <div class="meta">Min increment <span data-min="28000">₹28,000</span> • Ends in 2d 11h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Manhattan Skyline Penthouse">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Manhattan,+NY&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Manhattan, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="penthouse">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?q=80&w=1200&auto=format&fit=crop" alt="Marina Bay Penthouse"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Marina Bay Penthouse</h3><div class="price" data-current="7450000">₹7,450,000</div></div>
+            <div class="meta">Singapore, SG • 4 bd • 5 ba • 3,800 sqft</div>
+            <div class="meta">Min increment <span data-min="25000">₹25,000</span> • Ends in 3d 8h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Marina Bay Penthouse">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Marina+Bay,+Singapore&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Singapore"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="penthouse">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=1200&auto=format&fit=crop" alt="London River Penthouse"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">London River Penthouse</h3><div class="price" data-current="6890000">₹6,890,000</div></div>
+            <div class="meta">London, UK • 3 bd • 3 ba • 2,900 sqft</div>
+            <div class="meta">Min increment <span data-min="23000">₹23,000</span> • Ends in 6d 6h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="London River Penthouse">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=London,+UK&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - London, UK"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="estate">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1550956001-81a78047c7c7?q=80&w=1200&auto=format&fit=crop" alt="Napa Vineyard Estate"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Napa Vineyard Estate</h3><div class="price" data-current="5280000">₹5,280,000</div></div>
+            <div class="meta">Napa Valley, US • 6 bd • 6 ba • 7,900 sqft</div>
+            <div class="meta">Min increment <span data-min="20000">₹20,000</span> • Ends in 5d 12h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Napa Vineyard Estate">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Napa+Valley,+California&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Napa Valley, US"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="estate">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?q=80&w=1200&auto=format&fit=crop" alt="Scottish Highlands Estate"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Scottish Highlands Estate</h3><div class="price" data-current="4720000">₹4,720,000</div></div>
+            <div class="meta">Highlands, UK • 5 bd • 5 ba • 6,800 sqft</div>
+            <div class="meta">Min increment <span data-min="18000">₹18,000</span> • Ends in 7d 3h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Scottish Highlands Estate">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Scottish+Highlands&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Scottish Highlands"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="estate">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" alt="Provence Countryside Estate"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Provence Countryside Estate</h3><div class="price" data-current="4960000">₹4,960,000</div></div>
+            <div class="meta">Provence, FR • 6 bd • 5 ba • 6,400 sqft</div>
+            <div class="meta">Min increment <span data-min="19000">₹19,000</span> • Ends in 4d 18h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Provence Countryside Estate">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Provence,+France&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Provence, FR"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200&auto=format&fit=crop" alt="Scandinavian Minimal House"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Scandinavian Minimal House</h3><div class="price" data-current="1180000">₹1,180,000</div></div>
+            <div class="meta">Copenhagen, DK • 3 bd • 2 ba • 1,900 sqft</div>
+            <div class="meta">Min increment <span data-min="5000">₹5,000</span> • Ends in 6d 1h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Scandinavian Minimal House">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Copenhagen,+Denmark&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Copenhagen, DK"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1494526585095-3d711e4b58d2?q=80&w=1200&auto=format&fit=crop" alt="Tokyo Townhouse"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Tokyo Townhouse</h3><div class="price" data-current="980000">₹980,000</div></div>
+            <div class="meta">Tokyo, JP • 2 bd • 2 ba • 1,400 sqft</div>
+            <div class="meta">Min increment <span data-min="4000">₹4,000</span> • Ends in 3d 20h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Tokyo Townhouse">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Tokyo,+Japan&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Tokyo, JP"></iframe></div>
+          </div>
+        </article>
+        <article class="card" data-type="house">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1505691723518-36a5ac3b2d53?q=80&w=1200&auto=format&fit=crop" alt="Sydney Coastal House"></div>
+          <div class="body">
+            <div class="row"><h3 style="margin:0;font-size:1rem">Sydney Coastal House</h3><div class="price" data-current="1520000">₹1,520,000</div></div>
+            <div class="meta">Sydney, AU • 4 bd • 3 ba • 2,500 sqft</div>
+            <div class="meta">Min increment <span data-min="6000">₹6,000</span> • Ends in 4d 14h</div>
+            <div style="margin-top:10px"><button class="btn bid-btn" data-title="Sydney Coastal House">Bid Now</button></div>
+            <div style="margin-top:12px; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.18);"><iframe width="100%" height="180" frameborder="0" style="border:0; min-height:120px;" src="https://www.google.com/maps?q=Sydney,+Australia&output=embed" allowfullscreen aria-hidden="false" tabindex="0" title="Map - Sydney, AU"></iframe></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container inner">
+      <div>&copy; <span id="y"></span> LuxBid. All rights reserved.</div>
+      <div>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+  <!-- Quick-bid modal -->
+  <div id="bidModal" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="bidTitle">Place a Bid</h3>
+      <div class="row">
+        <button id="decStep" class="step" title="- min increment">−</button>
+        <input id="bidAmount" placeholder="Enter amount (₹)" type="number" min="0" />
+        <button id="incStep" class="step" title="+ min increment">+</button>
+        <button id="bidPlace" class="btn">Bid</button>
+      </div>
+      <div id="bidHint" class="hint"></div>
+      <div id="bidError" class="error"></div>
+      <div class="actions">
+        <button id="bidCancel" class="btn secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Footer year
+    (function(){
+      const y = document.getElementById('y');
+      if (y) y.textContent = new Date().getFullYear();
+    })();
+
+    // Smooth scroll to Featured
+    (function(){
+      function goFeatured(){
+        const sec = document.getElementById('featured');
+        if (!sec) return;
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const grid = document.getElementById('featuredGrid');
+        if (grid){
+          grid.classList.add('pulse-highlight');
+          setTimeout(()=>grid.classList.remove('pulse-highlight'), 1800);
+        }
+      }
+      document.querySelectorAll('a[href="#featured"]').forEach(a=>{
+        a.addEventListener('click', function(e){ e.preventDefault(); goFeatured(); });
+      });
+    })();
+
+    // Featured filter
+    (function(){
+      const container = document.getElementById('featuredGrid');
+      const pills = document.querySelectorAll('#featureFilters .pill');
+      function apply(filter){
+        (container?.querySelectorAll('article.card')||[]).forEach(card=>{
+          const t = card.getAttribute('data-type')||'';
+          card.style.display = (filter==='all' || t===filter) ? '' : 'none';
+        });
+      }
+      pills.forEach(p=>p.addEventListener('click', ()=>{
+        pills.forEach(x=>x.classList.remove('active'));
+        p.classList.add('active');
+        apply(p.getAttribute('data-filter'));
+      }));
+    })();
+
+    // Expose helper to display last bid alongside active bids count
+    (function(){
+      function toInr(n){ try { return '₹' + Number(n||0).toLocaleString('en-IN'); } catch { return '₹' + (n||0); } }
+      function compute(){
+        let bids = [];
+        try { bids = JSON.parse(localStorage.getItem('myBids')||'[]'); } catch {}
+        const el = document.getElementById('statActive');
+        if (!el) return;
+        if (!bids.length){ el.textContent = '—'; return; }
+        const last = bids.reduce((a,b)=> (a && a.time>=b.time)? a : b, null);
+        el.textContent = `${bids.length} • ${toInr(last?.amount)}`;
+        // Also update Post Auction link to point to the last bid's property
+        try {
+          const link = document.getElementById('postAuction');
+          if (link) {
+            let pid = last?.propertyId || null;
+            if (!pid && last?.propertyName && Array.isArray(window.mockProperties)){
+              const match = window.mockProperties.find(p => (p.title||'').trim() === String(last.propertyName||'').trim());
+              if (match && match._id) pid = String(match._id);
+            }
+            if (pid) {
+              link.href = `property.html?id=${encodeURIComponent(pid)}`;
+            } else if (last?.propertyName) {
+              link.href = `browse.html?q=${encodeURIComponent(String(last.propertyName).trim())}`;
+            } else {
+              link.href = 'property.html';
+            }
+          }
+        } catch {}
+      }
+      window.updateActiveBidsStat = compute;
+      // initial paint on load
+      compute();
+    })();
+
+    // Quick-bid modal behavior
+    (function(){
+      const backdrop = document.getElementById('bidModal');
+      const title = document.getElementById('bidTitle');
+      const input = document.getElementById('bidAmount');
+      const hint = document.getElementById('bidHint');
+      const err = document.getElementById('bidError');
+      const btnPlace = document.getElementById('bidPlace');
+      const btnCancel = document.getElementById('bidCancel');
+      const btnInc = document.getElementById('incStep');
+      const btnDec = document.getElementById('decStep');
+      let ctx = null; // { priceEl, minInc, current }
+      let lastSubmitTs = 0;
+
+      function inr(n){ return '₹' + (Number(n)||0).toLocaleString('en-IN'); }
+      function clampToIncrement(val, current, inc){
+        const base = current; const diff = val - base; const steps = Math.ceil(diff / inc);
+        return base + Math.max(steps, 0) * inc;
+      }
+      function persist(currentEl, val){
+        try{
+          const key = currentEl.closest('.card')?.querySelector('h3')?.textContent || 'unknown';
+          const store = JSON.parse(localStorage.getItem('luxbid_bids')||'{}');
+          store[key] = val;
+          localStorage.setItem('luxbid_bids', JSON.stringify(store));
+        }catch{}
+      }
+      function restore(currentEl, fallback){
+        try{
+          const key = currentEl.closest('.card')?.querySelector('h3')?.textContent || 'unknown';
+          const store = JSON.parse(localStorage.getItem('luxbid_bids')||'{}');
+          return Number(store[key]||fallback||0);
+        }catch{ return fallback; }
+      }
+      function isLoggedIn(){
+        try {
+          if (window.__isLoggedIn) return true;
+          const user = (typeof auth !== 'undefined' && auth.getUser) ? auth.getUser() : null;
+          return !!user;
+        } catch { return !!window.__isLoggedIn; }
+      }
+      function open(el){
+        const card = el.closest('.card');
+        const priceEl = card.querySelector('.price');
+        const minEl = card.querySelector('[data-min]');
+        let current = Number(priceEl.getAttribute('data-current')||0);
+        const minInc = Number(minEl?.getAttribute('data-min')||0);
+        ctx = { priceEl, minInc, current };
+        title.textContent = 'Place a Bid — ' + el.getAttribute('data-title');
+        const nextMin = current + minInc;
+        const restored = restore(priceEl, nextMin);
+        input.value = restored;
+        hint.textContent = 'Minimum allowed: ' + inr(nextMin);
+        err.style.display = 'none';
+        backdrop.style.display = 'flex';
+        input.focus();
+      }
+      function close(){ backdrop.style.display = 'none'; }
+      document.querySelectorAll('.bid-btn').forEach(b=>{ b.addEventListener('click', ()=> open(b)); });
+      const featuredGrid = document.getElementById('featuredGrid');
+      featuredGrid?.addEventListener('click', function(e){
+        const btn = e.target.closest('.bid-btn');
+        if (!btn) return;
+        return;
+      }, true);
+      btnCancel.addEventListener('click', close);
+      backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) close(); });
+      function place(){
+        if (!isLoggedIn()) {
+          if (confirm('You must be logged in to place a bid. Would you like to log in now?')) {
+            window.location.href = 'login.html';
+          }
+          return;
+        }
+        const now = Date.now();
+        if (now - lastSubmitTs < 1200){ return; }
+        lastSubmitTs = now;
+        const val = Number(input.value||0);
+        const minAllowed = ctx.current + ctx.minInc;
+        const fixed = clampToIncrement(val, ctx.current, ctx.minInc);
+        if (!fixed || fixed < minAllowed){
+          err.textContent = 'Bid must be at least ' + inr(minAllowed) + ' and in steps of ' + inr(ctx.minInc) + '.';
+          err.style.display = 'block';
+          return;
+        }
+        ctx.current = fixed;
+        ctx.priceEl.setAttribute('data-current', String(fixed));
+        ctx.priceEl.textContent = inr(fixed);
+        persist(ctx.priceEl, fixed);
+        // Persist to My Bids (local demo tracking)
+        try{
+          const title = (ctx.priceEl.closest('.card')?.querySelector('h3')?.textContent||'').trim();
+          // Try to resolve a propertyId from mockProperties by title
+          let pid = null;
+          try{
+            if (Array.isArray(window.mockProperties)){
+              const match = window.mockProperties.find(p => (p.title||'').trim() === title);
+              if (match && match._id) pid = String(match._id);
+            }
+          }catch{}
+          let list = [];
+          try{ list = JSON.parse(localStorage.getItem('myBids')||'[]'); }catch{}
+          list.push({ propertyId: pid, propertyName: title, amount: fixed, time: Date.now() });
+          localStorage.setItem('myBids', JSON.stringify(list));
+          if (typeof window.updateActiveBidsStat === 'function') window.updateActiveBidsStat();
+        }catch{}
+        close();
+        ctx.priceEl.closest('.card').classList.add('pulse-highlight');
+        setTimeout(()=>ctx.priceEl.closest('.card').classList.remove('pulse-highlight'), 1200);
+        alert('Bid placed (demo).');
+      }
+      btnPlace.addEventListener('click', place);
+      btnInc.addEventListener('click', ()=>{ const v = Number(input.value||0); input.value = String(v + (ctx?.minInc||0)); });
+      btnDec.addEventListener('click', ()=>{ const v = Number(input.value||0); const dec = v - (ctx?.minInc||0); const floor = ctx ? Math.max(dec, ctx.current + ctx.minInc) : dec; input.value = String(floor); });
+      input.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter'){ e.preventDefault(); place(); }
+        if (e.key === 'Escape'){ e.preventDefault(); close(); }
+      });
+    })();
+  </script>
+<script>
+  fetch('/me', { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      console.log('Logged-in user:', data);
+      // You can also display user info on the page:
+      document.getElementById('username').textContent = data.name;
+      document.getElementById('userphoto').src = data.photo;
+      window.__isLoggedIn = true;
+    });
+</script>
+<script>
+  fetch("/me", { credentials: "include" })
+    .then((res) => {
+      if (!res.ok) return;
+      return res.json();
+    })
+    .then((user) => {
+      if (user) {
+        // alert("You are welcome!"); // Removed annoying alert
+        window.__isLoggedIn = true;
+      }
+    });
+</script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('loggedOut') === 'true') {
+
+  }
+</script>
+  <!-- Auth UI elements -->
+  <div id="spinner" style="display: none;">⏳ Checking session...</div>
+
+  <script src="auth-UI.js"></script>
+</body>
+</html>

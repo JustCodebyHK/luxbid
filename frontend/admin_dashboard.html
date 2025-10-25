@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LuxBid Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-black text-white min-h-screen">
+  <header class="sticky top-0 z-10 bg-black/70 border-b border-neutral-800">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <h1 class="text-yellow-300 font-bold text-xl">LuxBid Admin</h1>
+      <button id="logoutBtn" class="bg-neutral-800 px-3 py-1.5 rounded">Logout</button>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6 text-yellow-300">Dashboard</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Add Property -->
+      <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+        <h3 class="text-xl font-semibold mb-4">Add Property</h3>
+        <form id="addPropertyForm" class="space-y-3">
+          <input required placeholder="Title" id="title" class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700" />
+          <input required placeholder="Location" id="location" class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700" />
+          <input required placeholder="Description" id="description" class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700" />
+          <input required placeholder="Starting Price" type="number" id="price" class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700" />
+          <input placeholder="Image URL" id="image" class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700" />
+          <button type="submit" class="w-full bg-yellow-400 text-black font-semibold py-2 rounded hover:bg-yellow-300">Add</button>
+        </form>
+        <div id="addMsg" class="mt-2 text-green-400 hidden">Property added!</div>
+      </div>
+
+      <!-- View Bids -->
+      <div class="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+        <h3 class="text-xl font-semibold mb-4">View Bids</h3>
+        <div id="bidsList" class="space-y-2 text-sm text-neutral-200">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Manage Properties -->
+    <div class="mt-8 bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+      <h3 class="text-xl font-semibold mb-4">Manage Properties</h3>
+      <div id="propertiesList" class="space-y-2 text-sm text-neutral-200">Loading...</div>
+    </div>
+
+    <!-- Bid Analytics -->
+    <div class="mt-8 bg-neutral-900 p-6 rounded-xl border border-neutral-800">
+      <h3 class="text-xl font-semibold mb-4">Average Bid by Region</h3>
+      <canvas id="regionChart" width="400" height="200"></canvas>
+    </div>
+  </main>
+
+  <script>
+    // Session check
+    fetch('/admin/session-check', { credentials: 'include' })
+      .then(res => {
+        if (!res.ok) {
+          window.location.href = '/admin.html';
+        } else {
+          renderRegionChart();
+        }
+      });
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = () => {
+      fetch('/admin/logout', { method: 'POST', credentials: 'include' })
+        .then(() => window.location.href = '/admin.html');
+    };
+
+    // Add Property
+    document.getElementById('addPropertyForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const property = {
+        title: document.getElementById('title').value,
+        location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
+        starting_price: Number(document.getElementById('price').value),
+        image_url: document.getElementById('image').value
+      };
+      const res = await fetch('/admin/add-property', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(property)
+      });
+      if (res.ok) {
+        document.getElementById('addPropertyForm').reset();
+        document.getElementById('addMsg').classList.remove('hidden');
+        setTimeout(() => document.getElementById('addMsg').classList.add('hidden'), 2000);
+        loadProperties();
+      }
+    };
+
+    // View Bids
+    async function loadBids() {
+      const res = await fetch('/admin/view-bids', { credentials: 'include' });
+      const bids = await res.json();
+      const container = document.getElementById('bidsList');
+      container.innerHTML = bids.length ? bids.map(b =>
+        `<div><span class="text-yellow-300 font-bold">${b.property_title}</span> — ₹${b.bid_amount} by ${b.user_name}</div>`
+      ).join('') : '<div class="text-neutral-400">No bids yet.</div>';
+    }
+
+    // Manage Properties
+    async function loadProperties() {
+      const res = await fetch('/api/properties', { credentials: 'include' });
+      const props = await res.json();
+      const container = document.getElementById('propertiesList');
+      if (!Array.isArray(props) || props.length === 0) {
+        container.innerHTML = '<div class="text-neutral-400">No properties found.</div>';
+        return;
+      }
+      container.innerHTML = props.map(p => `
+        <div class="flex items-center justify-between gap-4 border border-neutral-800 rounded-lg p-3">
+          <div>
+            <div class="font-semibold text-yellow-300">${p.title}</div>
+            <div class="text-neutral-400 text-xs">#${p.id} • ${p.location || ''}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button 
+              data-id="${p.id}"
+              data-title="${(p.title||'').replaceAll('"','&quot;')}"
+              data-location="${(p.location||'').replaceAll('"','&quot;')}"
+              data-description="${(p.description||'').replaceAll('"','&quot;')}"
+              data-price="${p.starting_price ?? p.startingBid ?? ''}"
+              data-image="${(p.image_url||'').replaceAll('"','&quot;')}"
+              class="edit-btn bg-neutral-700 hover:bg-neutral-600 text-white font-semibold px-3 py-1.5 rounded">Edit</button>
+            <button data-id="${p.id}" class="del-btn bg-red-500 hover:bg-red-400 text-black font-semibold px-3 py-1.5 rounded">Delete</button>
+          </div>
+        </div>
+      `).join('');
+      container.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          if (!confirm('Delete this property?')) return;
+          const r = await fetch(`/admin/remove-property/${id}`, { method: 'DELETE', credentials: 'include' });
+          if (r.ok) loadProperties();
+        });
+      });
+      container.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const curTitle = btn.getAttribute('data-title') || '';
+          const curLoc = btn.getAttribute('data-location') || '';
+          const curDesc = btn.getAttribute('data-description') || '';
+          const curPrice = btn.getAttribute('data-price') || '';
+          const curImg = btn.getAttribute('data-image') || '';
+
+          const title = prompt('Title', curTitle);
+          if (title === null) return;
+          const location = prompt('Location', curLoc);
+          if (location === null) return;
+          const description = prompt('Description', curDesc);
+          if (description === null) return;
+          const starting_price_str = prompt('Starting Price', String(curPrice));
+          if (starting_price_str === null) return;
+          const starting_price = Number(starting_price_str || 0);
+          const image_url = prompt('Image URL', curImg);
+          if (image_url === null) return;
+
+          const resp = await fetch(`/admin/update-property/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ title, location, description, starting_price, image_url })
+          });
+          if (resp.ok) {
+            alert('Property updated');
+            loadProperties();
+          } else {
+            alert('Update failed');
+          }
+        });
+      });
+    }
+
+    async function renderRegionChart() {
+      const res = await fetch('/admin/bid-analytics', { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const grouped = {};
+      data.forEach(({ location, bid_amount }) => {
+        grouped[location || 'Unknown'] = (grouped[location || 'Unknown'] || []).concat(Number(bid_amount)||0);
+      });
+      const labels = Object.keys(grouped);
+      const avgBids = labels.map(loc => {
+        const bids = grouped[loc];
+        return bids.length ? bids.reduce((a, b) => a + b, 0) / bids.length : 0;
+      });
+      new Chart(document.getElementById('regionChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Average Bid by Region',
+            data: avgBids,
+            backgroundColor: 'rgba(255, 206, 86, 0.6)'
+          }]
+        }
+      });
+    }
+
+    loadBids();
+    loadProperties();
+    renderRegionChart();
+  </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse — LuxBid</title>
+  <meta name="description" content="Browse luxury properties and place bids.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://images.unsplash.com" />
+</head>
+<body class="bg-black text-white bg-[radial-gradient(ellipse_at_top,_rgba(234,179,8,0.06),_transparent_60%)]">
+  <header class="sticky top-0 z-10 backdrop-blur bg-black/70 border-b border-neutral-800">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="text-yellow-300 font-extrabold tracking-wide">LuxBid</a>
+      <nav class="text-sm text-neutral-300 space-x-6">
+        <a class="hover:text-white" href="browse.html">Browse</a>
+        <div id="userNav" class="hidden inline-flex items-center gap-2">
+          <a href="index.html" class="bg-neutral-800 px-3 py-1.5 rounded hover:bg-yellow-400 hover:text-black">Home</a>
+          <a href="live_auctions.html" class="bg-neutral-800 px-3 py-1.5 rounded hover:bg-yellow-400 hover:text-black">Live Auction</a>
+          <a href="my_bidding.html" class="bg-neutral-800 px-3 py-1.5 rounded hover:bg-yellow-400 hover:text-black">My Bidding</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="mb-4">
+      <h1 class="text-2xl font-bold">Explore Properties</h1>
+      <p class="text-neutral-400 text-sm">Search luxury houses, mansions, and villas. Use filters to refine your results.</p>
+    </div>
+    <div class="border border-neutral-800 rounded-xl p-4 md:p-5 bg-neutral-950/60 backdrop-blur grid md:grid-cols-5 gap-3 md:gap-4 mb-6 shadow-lg shadow-black/20">
+      <input id="q" placeholder="Search by title or location" class="bg-neutral-900/80 border border-neutral-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400 md:col-span-2" />
+      <select id="type" class="bg-neutral-900/80 border border-neutral-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400">
+        <option value="">Any Type</option>
+        <option value="house">House</option>
+        <option value="mansion">Mansion</option>
+        <option value="villa">Villa</option>
+      </select>
+      <input id="location" placeholder="Location" class="bg-neutral-900/80 border border-neutral-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+      <div class="grid grid-cols-2 gap-2 md:col-span-2">
+        <input id="minPrice" placeholder="Min Price (₹)" class="bg-neutral-900/80 border border-neutral-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+        <input id="maxPrice" placeholder="Max Price (₹)" class="bg-neutral-900/80 border border-neutral-700 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+      </div>
+      <button class="bg-yellow-400 text-black font-semibold px-3 py-2 rounded-md hover:bg-yellow-300" onclick="applyFilters()">Apply</button>
+    </div>
+
+    <div class="flex items-center justify-between mb-3">
+      <div id="resultsLabel" class="text-sm text-neutral-400">Showing all properties</div>
+      <a href="#" class="text-xs text-neutral-400 hover:text-white" onclick="window.scrollTo({top:0, behavior:'smooth'})">Back to top</a>
+    </div>
+
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <footer class="mt-10 border-t border-neutral-800 bg-black/60">
+    <div class="container mx-auto px-4 py-6 text-sm text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div>© <span id="y"></span> LuxBid. All rights reserved.</div>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-white" href="#">Privacy</a>
+        <a class="hover:text-white" href="#">Terms</a>
+        <a class="hover:text-white" href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    function syncNav(){
+      const u = auth.getUser();
+      const userNav = document.getElementById('userNav');
+      if (userNav) userNav.classList.toggle('hidden', !u);
+    }
+    function logout(){ auth.logout(); syncNav(); }
+    syncNav();
+
+    const grid = document.getElementById('grid');
+    const inputs = {
+      q: document.getElementById('q'),
+      type: document.getElementById('type'),
+      location: document.getElementById('location'),
+      minPrice: document.getElementById('minPrice'),
+      maxPrice: document.getElementById('maxPrice'),
+    };
+
+    function render(list){
+      document.getElementById('resultsLabel').textContent = `Showing ${list.length} result${list.length===1?'':'s'}`;
+      const u = auth.getUser();
+      grid.innerHTML = list.map(p => {
+        const img = window.selectImg(p.images);
+        return `
+          <a href="./property.html?id=${encodeURIComponent(p._id)}" class="block border border-neutral-800 rounded-2xl overflow-hidden hover:scale-[1.01] transition shadow-lg shadow-black/30">
+            <div class="relative aspect-[16/10] bg-neutral-900">
+              <img class="w-full h-full object-cover" src="${img}" alt="${p.title}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop'">
+              <span class="absolute top-2 left-2 text-[10px] uppercase tracking-wide bg-black/70 border border-neutral-700 px-2 py-1 rounded-full">${p.type}</span>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-lg">${p.title}</h3>
+                <span class="text-yellow-300 font-semibold">${window.inr(p.currentBid)}</span>
+              </div>
+              <p class="text-sm text-neutral-400">${p.location}</p>
+              <div class="text-xs text-neutral-400 flex gap-4">
+                ${p.amenities?.bedrooms?`<span>${p.amenities.bedrooms} bd</span>`:''}
+                ${p.amenities?.bathrooms?`<span>${p.amenities.bathrooms} ba</span>`:''}
+                ${p.amenities?.sqft?`<span>${p.amenities.sqft.toLocaleString()} sqft</span>`:''}
+              </div>
+              <div class="text-xs text-neutral-400">Min increment ${window.inr(p.minIncrement)}</div>
+              <div class="text-xs text-neutral-500">Ends in ${window.formatCountdown(p.deadline)}</div>
+            </div>
+          </a>`
+      }).join('');
+    }
+
+    function applyFilters(){
+      const q = inputs.q.value.trim().toLowerCase();
+      const type = inputs.type.value;
+      const loc = inputs.location.value.trim().toLowerCase();
+      const min = inputs.minPrice.value ? Number(inputs.minPrice.value) : undefined;
+      const max = inputs.maxPrice.value ? Number(inputs.maxPrice.value) : undefined;
+      const list = window.mockProperties.filter(p => {
+        if (type && p.type !== type) return false;
+        if (q && !(p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.location.toLowerCase().includes(q))) return false;
+        if (loc && !p.location.toLowerCase().includes(loc)) return false;
+        if (min !== undefined && p.startingBid < min) return false;
+        if (max !== undefined && p.startingBid > max) return false;
+        return true;
+      });
+      render(list);
+    }
+
+    async function loadPropertiesFromAssets(){
+      try{
+        const res = await fetch('./assets/data/properties.json', { cache: 'no-store' });
+        const raw = await res.json();
+        // map deadline strings like ${NOW_PLUS_3DAYS} or ${NOW_PLUS_2DAYS6HRS}
+        const re = /NOW_PLUS_(\d+)DAYS?(?:(\d+)HRS)?/;
+        const mapped = (Array.isArray(raw)?raw:[]).map(p=>{
+          let dl = p.deadline;
+          if (typeof dl === 'string'){
+            const m = dl.match(re);
+            if (m){
+              const days = Number(m[1]||0);
+              const hrs = Number(m[2]||0);
+              dl = Date.now() + days*24*3600*1000 + hrs*3600*1000;
+            } else {
+              dl = Date.now() + 3*24*3600*1000;
+            }
+          }
+          return { ...p, deadline: dl };
+        });
+        window.mockProperties = mapped;
+        render(window.mockProperties);
+      }catch(err){
+        console.error('Failed to load properties.json', err);
+        window.mockProperties = window.mockProperties || [];
+        render(window.mockProperties);
+      }
+    }
+
+    async function loadPropertiesFromApi(){
+      try{
+        const res = await fetch('/api/properties', { credentials: 'include', cache: 'no-store' });
+        if (!res.ok) throw new Error('API not available');
+        const rows = await res.json();
+        const mapped = (Array.isArray(rows)?rows:[]).map(r => ({
+          _id: String(r.id ?? r._id ?? ''),
+          title: r.title || 'Untitled',
+          description: r.description || '',
+          type: r.type || 'house',
+          location: r.location || '',
+          images: r.images || (r.image_url ? [r.image_url] : []),
+          startingBid: Number(r.startingBid ?? r.starting_price ?? 0),
+          currentBid: Number(r.currentBid ?? r.starting_price ?? 0),
+          minIncrement: Number(r.minIncrement ?? 10000),
+          deadline: r.deadline ? Number(r.deadline) : (Date.now() + 3*24*3600*1000),
+          amenities: r.amenities || {}
+        }));
+        if (!mapped.length) {
+          // No properties in DB yet, fallback to bundled assets
+          return await loadPropertiesFromAssets();
+        }
+        window.mockProperties = mapped;
+        render(window.mockProperties);
+      }catch(err){
+        console.warn('Falling back to assets data. Reason:', err.message);
+        await loadPropertiesFromAssets();
+      }
+    }
+
+    loadPropertiesFromApi();
+  </script>
+</body>
+</html>

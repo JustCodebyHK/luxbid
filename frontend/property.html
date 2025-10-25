@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Property — LuxBid</title>
+  <meta name="description" content="View property details and place a bid.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://images.unsplash.com" />
+</head>
+<body class="bg-black text-white bg-[radial-gradient(ellipse_at_top,_rgba(234,179,8,0.06),_transparent_60%)]">
+  <header class="sticky top-0 z-10 backdrop-blur bg-black/70 border-b border-neutral-800">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="text-yellow-300 font-extrabold tracking-wide">LuxBid</a>
+      <nav class="text-sm text-neutral-300 space-x-6"></nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8 grid lg:grid-cols-5 gap-6">
+    <div class="lg:col-span-3 space-y-3">
+      <div class="relative overflow-hidden rounded-2xl border border-neutral-800 aspect-[16/10] bg-neutral-900 shadow-xl shadow-black/30">
+        <img id="mainImg" class="w-full h-full object-cover" alt="Property" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop'" />
+        <span id="typeBadge" class="absolute top-3 left-3 text-[10px] uppercase tracking-wide bg-black/70 border border-neutral-700 px-2 py-1 rounded-full"></span>
+      </div>
+      <div id="thumbs" class="grid grid-cols-6 gap-2"></div>
+      <div class="border border-neutral-800 rounded-2xl p-4 bg-neutral-950/60 backdrop-blur">
+        <h2 class="font-semibold mb-2">Location</h2>
+        <div id="loc" class="text-neutral-300"></div>
+        <div id="mapBox" class="mt-3 h-64 w-full rounded-lg overflow-hidden shadow-lg">
+          <iframe id="gmap" width="100%" height="100%" frameborder="0" style="border:0; min-height:220px;" allowfullscreen aria-hidden="false" tabindex="0" title="Google Map"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="lg:col-span-2 space-y-4">
+      <div class="border border-yellow-400 rounded-2xl p-5 bg-neutral-950/80 backdrop-blur shadow-xl shadow-yellow-400/20 mb-4">
+        <h2 class="text-xl font-bold mb-2 text-yellow-300">Auction Information</h2>
+        <div class="flex flex-col gap-2 text-base">
+          <div><span class="font-semibold text-neutral-300">Property Image:</span><br><img id="infoImg" class="rounded-lg mt-1 mb-2 w-full max-w-xs border border-neutral-800" src="" alt="Property Image" /></div>
+          <div><span class="font-semibold text-neutral-300">Property Name:</span> <span id="infoTitle"></span></div>
+          <div><span class="font-semibold text-neutral-300">Starting Price:</span> <span id="infoStart"></span></div>
+          <div><span class="font-semibold text-neutral-300">Highest Bidder:</span> <span id="infoBidder">N/A</span></div>
+          <div><span class="font-semibold text-neutral-300">Highest Bid Price:</span> <span id="infoHigh"></span></div>
+          <div><span class="font-semibold text-neutral-300">End Date:</span> <span id="infoEnd"></span></div>
+          <div><span class="font-semibold text-neutral-300">Status:</span> <span id="infoStatus"></span></div>
+        </div>
+      </div>
+      <div class="border border-neutral-800 rounded-2xl p-5 space-y-3 bg-neutral-950/60 backdrop-blur shadow-xl shadow-black/30">
+        <h1 id="title" class="text-2xl font-bold">Property</h1>
+        <div id="desc" class="text-neutral-300"></div>
+        <div class="flex items-center gap-4">
+          <div id="price" class="text-xl font-semibold text-yellow-300">₹0</div>
+          <div id="minInc" class="text-sm text-neutral-400">Min increment ₹0</div>
+        <div class="text-sm">Ends in <span id="countdown">--</span></div>
+      </div>
+
+      <form id="bidForm" class="border border-neutral-800 rounded-2xl p-5 space-y-3 bg-neutral-950/60 backdrop-blur shadow-xl shadow-black/30" onsubmit="placeBid(event)">
+        <h2 class="font-semibold">Place a Bid</h2>
+        <div id="bidError" class="hidden text-red-400 text-sm"></div>
+        <input id="amount" class="w-full rounded-md bg-neutral-900/80 border border-neutral-700 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-400" placeholder="Amount (₹)" />
+        <button id="bidButton" type="submit" class="w-full bg-yellow-400 text-black font-semibold py-2 px-4 rounded-md hover:bg-yellow-300">Place Bid</button>
+      </form>
+      <div id="bidHint" class="text-xs text-neutral-400"></div>
+
+      <div class="border border-neutral-800 rounded-2xl p-5 bg-neutral-950/60 backdrop-blur shadow-xl shadow-black/30">
+        <h3 class="font-semibold mb-2">Amenities</h3>
+        <div id="amen" class="text-sm text-neutral-300 flex gap-4"></div>
+    </div>
+  </main>
+
+  <footer class="mt-10 border-t border-neutral-800 bg-black/60">
+    <div class="container mx-auto px-4 py-6 text-sm text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div>© <span id="y"></span> LuxBid. All rights reserved.</div>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-white" href="#">Privacy</a>
+        <a class="hover:text-white" href="#">Terms</a>
+        <a class="hover:text-white" href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/data.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    function syncNav(){}
+    function logout(){ auth.logout(); }
+    // Also mark logged-in via backend session if available
+    fetch('/me', { credentials:'include' })
+      .then(r=> r.ok ? r.json() : null)
+      .then(u=>{ if(u){ window.__isLoggedIn = true; syncNav(); } })
+      .catch(()=>{});
+    syncNav();
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const p = (window.mockProperties||[]).find(x => x._id === id) || window.mockProperties[0];
+
+    const mainImg = document.getElementById('mainImg');
+    const typeBadge = document.getElementById('typeBadge');
+    const thumbs = document.getElementById('thumbs');
+    const title = document.getElementById('title');
+    const desc = document.getElementById('desc');
+    const loc = document.getElementById('loc');
+    const price = document.getElementById('price');
+    const minInc = document.getElementById('minInc');
+    const countdown = document.getElementById('countdown');
+    const bidHint = document.getElementById('bidHint');
+    const amen = document.getElementById('amen');
+
+    function render(){
+      title.textContent = p.title;
+      desc.textContent = p.description;
+      loc.textContent = p.location;
+      price.textContent = window.inr(p.currentBid);
+      minInc.textContent = `Min increment ${window.inr(p.minIncrement)}`;
+      amen.innerHTML = [
+        p.amenities?.bedrooms?`${p.amenities.bedrooms} bd`:'' ,
+        p.amenities?.bathrooms?`${p.amenities.bathrooms} ba`:'' ,
+        p.amenities?.sqft?`${p.amenities.sqft.toLocaleString()} sqft`:'']
+        .filter(Boolean).map(x=>`<span>${x}</span>`).join('');
+      mainImg.src = window.selectImg(p.images);
+      typeBadge.textContent = p.type || '';
+      thumbs.innerHTML = (p.images||[]).slice(0,6).map((u,i)=>`<button class="border border-neutral-800 rounded-lg overflow-hidden aspect-[4/3] ${i===0?'ring-1 ring-yellow-400':''}" onclick="document.getElementById('mainImg').src='${u}'"><img class="w-full h-full object-cover" src="${u}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop'"/></button>`).join('');
+      countdown.textContent = window.formatCountdown(p.deadline);
+      bidHint.textContent = `You must bid at least ${window.inr(p.currentBid + p.minIncrement)}.`;
+      // Set Google Map iframe src
+      var map = document.getElementById('gmap');
+      if (map && p.location) {
+        var q = encodeURIComponent(p.location.replace(/\s*•.*$/, ''));
+        map.src = `https://www.google.com/maps?q=${q}&output=embed`;
+      }
+      // Auction Info Card
+      document.getElementById('infoImg').src = window.selectImg(p.images);
+      document.getElementById('infoImg').onerror = function(){ this.onerror=null; this.src='https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop'; };
+      document.getElementById('infoTitle').textContent = p.title;
+      document.getElementById('infoStart').textContent = window.inr(p.startingBid);
+      document.getElementById('infoHigh').textContent = window.inr(p.currentBid);
+      document.getElementById('infoEnd').textContent = window.formatDateTime(p.deadline);
+      document.getElementById('infoStatus').textContent = (p.deadline < Date.now()) ? 'Closed' : 'Live';
+    }
+
+    render();
+    setInterval(()=>{ countdown.textContent = window.formatCountdown(p.deadline); }, 1000);
+
+    function isLoggedIn(){
+      try{
+        if (window.__isLoggedIn) return true;
+        const u = (typeof auth!== 'undefined' && auth.getUser)? auth.getUser() : null;
+        return !!u;
+      }catch{ return !!window.__isLoggedIn; }
+    }
+
+    window.placeBid = function(e){
+      e.preventDefault();
+      const errBox = document.getElementById('bidError');
+      errBox.classList.add('hidden');
+      if(!isLoggedIn()){
+        // Redirect to login page instead of just showing an error
+        if (confirm('You must be logged in to place a bid. Would you like to log in now?')) {
+          window.location.href = 'login.html';
+        }
+        return;
+      }
+      const amount = Number(document.getElementById('amount').value||0);
+      const minAllowed = p.currentBid + p.minIncrement;
+      if (Number.isNaN(amount) || amount < minAllowed){
+        errBox.textContent = `Bid must be at least ${window.inr(minAllowed)}.`;
+        errBox.classList.remove('hidden');
+        return;
+      }
+      p.currentBid = amount; // mock update
+      // Track bid in localStorage for My Bidding (append each bid)
+      try {
+        let myBids = [];
+        try { myBids = JSON.parse(localStorage.getItem('myBids')||'[]'); } catch {}
+        myBids.push({ propertyId: p._id, propertyName: p.title, amount, time: Date.now() });
+        localStorage.setItem('myBids', JSON.stringify(myBids));
+      } catch {}
+      alert('✅ Bid placed successfully! (Demo Mode)\n\nYour bid of ' + window.inr(amount) + ' has been recorded.');
+      document.getElementById('amount').value='';
+      render();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+[
+  {
+    "_id": "p1",
+    "title": "Mediterranean Villa",
+    "description": "Elegant cliffside villa with panoramic sea views and infinity pool.",
+    "type": "villa",
+    "location": "Amalfi Coast, IT",
+    "images": [
+      "https://th.bing.com/th/id/OIP.iRB0cYXa7Vau4dxVTVpOVgHaLH?w=1200&h=1200&rs=1&pid=ImgDetMain",
+      "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 20000000,
+    "currentBid": 24500000,
+    "minIncrement": 100000,
+    "deadline": "${NOW_PLUS_3DAYS}",
+    "amenities": { "bedrooms": 4, "bathrooms": 4, "sqft": 4200 }
+  },
+  {
+    "_id": "p2",
+    "title": "Modern Hillside Mansion",
+    "description": "Glass-walled mansion with home theater and rooftop helipad.",
+    "type": "mansion",
+    "location": "Los Angeles, US",
+    "images": [
+      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 52000000,
+    "currentBid": 59800000,
+    "minIncrement": 250000,
+    "deadline": "${NOW_PLUS_1DAY2HRS}",
+    "amenities": { "bedrooms": 6, "bathrooms": 7, "sqft": 9800 }
+  },
+  {
+    "_id": "p3",
+    "title": "Lakeside Designer House",
+    "description": "Minimalist house with private dock and floor-to-ceiling windows.",
+    "type": "house",
+    "location": "Zurich, CH",
+    "images": [
+      "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 11000000,
+    "currentBid": 13200000,
+    "minIncrement": 50000,
+    "deadline": "${NOW_PLUS_5DAYS8HRS}",
+    "amenities": { "bedrooms": 3, "bathrooms": 3, "sqft": 2700 }
+  },
+  {
+    "_id": "p4",
+    "title": "Skyline Penthouse",
+    "description": "Luxury penthouse with 360° city views and private elevator.",
+    "type": "villa",
+    "location": "Dubai, AE",
+    "images": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c52f?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 33000000,
+    "currentBid": 37500000,
+    "minIncrement": 125000,
+    "deadline": "${NOW_PLUS_2DAYS6HRS}",
+    "amenities": { "bedrooms": 3, "bathrooms": 4, "sqft": 3100 }
+  },
+  {
+    "_id": "p5",
+    "title": "Countryside Estate",
+    "description": "Classic stone estate with expansive gardens and stables.",
+    "type": "house",
+    "location": "Cotswolds, UK",
+    "images": [
+      "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 18000000,
+    "currentBid": 20800000,
+    "minIncrement": 80000,
+    "deadline": "${NOW_PLUS_4DAYS3HRS}",
+    "amenities": { "bedrooms": 5, "bathrooms": 4, "sqft": 5300 }
+  },
+  {
+    "_id": "p6",
+    "title": "Beachfront Villa",
+    "description": "Private beachfront with infinity pool and open-air lounge.",
+    "type": "villa",
+    "location": "Phuket, TH",
+    "images": [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 39000000,
+    "currentBid": 44200000,
+    "minIncrement": 200000,
+    "deadline": "${NOW_PLUS_2DAYS22HRS}",
+    "amenities": { "bedrooms": 5, "bathrooms": 5, "sqft": 6000 }
+  },
+  {
+    "_id": "p7",
+    "title": "Prime Residential Plot",
+    "description": "Corner plot in gated community with wide road access.",
+    "type": "land",
+    "location": "Bengaluru, IN",
+    "images": ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 7500000,
+    "currentBid": 8200000,
+    "minIncrement": 25000,
+    "deadline": "${NOW_PLUS_2DAYS5HRS}",
+    "amenities": { "sqft": 2400 }
+  },
+  {
+    "_id": "p8",
+    "title": "Commercial Land Parcel",
+    "description": "High-street frontage ideal for retail/office development.",
+    "type": "commercial-land",
+    "location": "Gurugram, IN",
+    "images": ["https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 26000000,
+    "currentBid": 27500000,
+    "minIncrement": 100000,
+    "deadline": "${NOW_PLUS_1DAY10HRS}",
+    "amenities": { "sqft": 10000 }
+  },
+  {
+    "_id": "p9",
+    "title": "Riverfront Farm Land",
+    "description": "Fertile acreage with irrigation access and farmhouse.",
+    "type": "farm",
+    "location": "Nashik, IN",
+    "images": ["https://images.unsplash.com/photo-1471194402529-8e0f5a675de6?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 12000000,
+    "currentBid": 13900000,
+    "minIncrement": 50000,
+    "deadline": "${NOW_PLUS_6DAYS}",
+    "amenities": { "sqft": 130680 }
+  },
+  {
+    "_id": "p10",
+    "title": "Private Island Plot",
+    "description": "Secluded island parcel with pristine shoreline.",
+    "type": "island",
+    "location": "Maldives",
+    "images": ["https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 95000000,
+    "currentBid": 102000000,
+    "minIncrement": 500000,
+    "deadline": "${NOW_PLUS_9DAYS}",
+    "amenities": { "sqft": 871200 }
+  },
+  {
+    "_id": "p11",
+    "title": "Hilltop Tea Estate",
+    "description": "Operational estate with breathtaking valley views.",
+    "type": "estate",
+    "location": "Munnar, IN",
+    "images": ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 38000000,
+    "currentBid": 40200000,
+    "minIncrement": 150000,
+    "deadline": "${NOW_PLUS_7DAYS}",
+    "amenities": { "sqft": 2178000 }
+  },
+  {
+    "_id": "p12",
+    "title": "City Center Office Floor",
+    "description": "Grade-A office floorplate with 40 parking bays.",
+    "type": "commercial",
+    "location": "Mumbai, IN",
+    "images": [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1461715407244-5d063f53d92d?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 67000000,
+    "currentBid": 71500000,
+    "minIncrement": 250000,
+    "deadline": "${NOW_PLUS_3DAYS6HRS}",
+    "amenities": { "sqft": 20000 }
+  },
+  {
+    "_id": "p13",
+    "title": "Countryside Ranch Land",
+    "description": "Rolling meadows ideal for ranching or eco-resort.",
+    "type": "ranch",
+    "location": "Texas, US",
+    "images": ["https://images.unsplash.com/photo-1496483648148-47c686dc86a8?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 22000000,
+    "currentBid": 23800000,
+    "minIncrement": 75000,
+    "deadline": "${NOW_PLUS_8DAYS}",
+    "amenities": { "sqft": 4356000 }
+  },
+  {
+    "_id": "p14",
+    "title": "Seaside Residential Plot",
+    "description": "Second-row plot with ocean glimpses and beach access.",
+    "type": "land",
+    "location": "Goa, IN",
+    "images": [
+      "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 9800000,
+    "currentBid": 10400000,
+    "minIncrement": 30000,
+    "deadline": "${NOW_PLUS_2DAYS20HRS}",
+    "amenities": { "sqft": 3000 }
+  },
+  {
+    "_id": "p15",
+    "title": "Boutique Heritage Haveli",
+    "description": "Restored haveli suitable for boutique hotel conversion.",
+    "type": "mansion",
+    "location": "Jaipur, IN",
+    "images": ["https://images.unsplash.com/photo-1470145318698-cb03732f5ddf?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 25000000,
+    "currentBid": 27100000,
+    "minIncrement": 90000,
+    "deadline": "${NOW_PLUS_6DAYS4HRS}",
+    "amenities": { "bedrooms": 10, "bathrooms": 10, "sqft": 12000 }
+  },
+  {
+    "_id": "p16",
+    "title": "Premium Golf Course Plot",
+    "description": "Exclusive golf course plot with stunning fairway views.",
+    "type": "land",
+    "location": "Gurgaon, IN",
+    "images": [
+      "https://cdn.golflux.com/wp-content/uploads/2024/03/best-golf-courses-in-India.jpg",
+      "https://images.unsplash.com/photo-1467951591042-f388365db261?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "startingBid": 15000000,
+    "currentBid": 16800000,
+    "minIncrement": 50000,
+    "deadline": "${NOW_PLUS_4DAYS8HRS}",
+    "amenities": { "sqft": 6000 }
+  },
+  {
+    "_id": "p17",
+    "title": "Ski Chalet",
+    "description": "Cozy chalet near ski lifts with cedar sauna.",
+    "type": "house",
+    "location": "Zermatt, CH",
+    "images": ["https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 21000000,
+    "currentBid": 22600000,
+    "minIncrement": 70000,
+    "deadline": "${NOW_PLUS_3DAYS12HRS}",
+    "amenities": { "bedrooms": 4, "bathrooms": 3, "sqft": 3200 }
+  },
+  {
+    "_id": "p18",
+    "title": "Lakeview Commercial Plot",
+    "description": "Mixed-use plot with zoning for retail + residential.",
+    "type": "commercial-land",
+    "location": "Pune, IN",
+    "images": ["https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 19500000,
+    "currentBid": 20400000,
+    "minIncrement": 60000,
+    "deadline": "${NOW_PLUS_5DAYS3HRS}",
+    "amenities": { "sqft": 8000 }
+  },
+  {
+    "_id": "p19",
+    "title": "Santorini White Villa",
+    "description": "Iconic whitewashed villa with caldera views.",
+    "type": "villa",
+    "location": "Santorini, GR",
+    "images": ["https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 36000000,
+    "currentBid": 41200000,
+    "minIncrement": 180000,
+    "deadline": "${NOW_PLUS_4DAYS6HRS}",
+    "amenities": { "bedrooms": 4, "bathrooms": 4, "sqft": 3600 }
+  },
+  {
+    "_id": "p20",
+    "title": "Bali Cliff Villa",
+    "description": "Cliffside villa with sunset ocean views.",
+    "type": "villa",
+    "location": "Uluwatu, ID",
+    "images": ["https://images.unsplash.com/photo-1505692794403-34d4982f88aa?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 32000000,
+    "currentBid": 35600000,
+    "minIncrement": 180000,
+    "deadline": "${NOW_PLUS_4DAYS6HRS}",
+    "amenities": { "bedrooms": 5, "bathrooms": 5, "sqft": 5200 }
+  },
+  {
+    "_id": "p21",
+    "title": "Scandinavian Minimal House",
+    "description": "Light-filled minimal home with warm wood interiors.",
+    "type": "house",
+    "location": "Copenhagen, DK",
+    "images": ["https://images.unsplash.com/photo-1464983953574-0892a716854b?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 15000000,
+    "currentBid": 16200000,
+    "minIncrement": 60000,
+    "deadline": "${NOW_PLUS_3DAYS}",
+    "amenities": { "bedrooms": 3, "bathrooms": 2, "sqft": 2100 }
+  },
+  {
+    "_id": "p22",
+    "title": "Tokyo Townhouse",
+    "description": "Compact townhouse with rooftop terrace.",
+    "type": "house",
+    "location": "Tokyo, JP",
+    "images": ["https://images.unsplash.com/photo-1502156473361-7f4ee915b01a?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 23000000,
+    "currentBid": 24100000,
+    "minIncrement": 70000,
+    "deadline": "${NOW_PLUS_6DAYS}",
+    "amenities": { "bedrooms": 2, "bathrooms": 2, "sqft": 1400 }
+  },
+  {
+    "_id": "p23",
+    "title": "Manhattan Skyline Penthouse",
+    "description": "Penthouse with skyline views and private terrace.",
+    "type": "penthouse",
+    "location": "New York, US",
+    "images": ["https://images.unsplash.com/photo-1468436139062-f60a71c5c892?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 88000000,
+    "currentBid": 93200000,
+    "minIncrement": 350000,
+    "deadline": "${NOW_PLUS_2DAYS}",
+    "amenities": { "bedrooms": 4, "bathrooms": 4, "sqft": 4500 }
+  },
+  {
+    "_id": "p24",
+    "title": "Napa Vineyard Estate",
+    "description": "Estate with private vineyards and tasting room.",
+    "type": "estate",
+    "location": "California, US",
+    "images": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop"],
+    "startingBid": 54000000,
+    "currentBid": 57500000,
+    "minIncrement": 220000,
+    "deadline": "${NOW_PLUS_5DAYS}",
+    "amenities": { "bedrooms": 6, "bathrooms": 6, "sqft": 7800 }
+  }
+]
